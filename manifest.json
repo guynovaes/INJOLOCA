@@ -2,15 +2,15 @@
   "manifest_version": 2,
 
   "name": "INJOLOCA",
-  "description": "Inserir Jogos no Loterias Online da Caixa.",
-  "version": "0.4",
-
+  "description": "Inserir Jogos no Loterias Online da Caixa. Extensão para preencher os jogos no site de loterias da Caixa.",
+  "version": "0.8",
+  "icons": {"48": "icon48.png",
+          "128": "icon128.png" },
   "browser_action": {
-    "default_title": "INJOLOCA!",
+    "default_title": "INJOLOCA",
     "default_popup": "popup.html"
   },
   "permissions": [
-    "activeTab",
-   "tabs"
+    "activeTab"
   ]
 }

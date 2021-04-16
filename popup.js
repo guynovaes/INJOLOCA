@@ -5,17 +5,24 @@
 // Script sem garantia. Use por sua conta e risco.
 
 // função que clica nos números na DOM
-
-
-function modifyDOM(linha, quantidade) {
+function modifyDOM(linha, quantidade, qtdTeimosa, marcaEspelho) {
 
 	var volante = linha.split(' ');
 	document.getElementById('limparvolante').click();
 
+	if (marcaEspelho == 1) {
+		var esp = document.getElementById('apostaEspelho');
+		esp.click();
+	}
 	// clica no botão aumentarnumero a quantidade de vezes que o usuário selecionou
 	for(var i = 0;i < quantidade; i++){
 		document.getElementById('aumentarnumero').click();
 	}
+
+	// clica no botão aumentarnumero a quantidade de vezes da Teimosinha
+	for(var i = 0;i < qtdTeimosa; i++){
+		document.getElementById('aumentarteimosinha').click();
+	}	
 
 	for(var i = 0;i < volante.length;i++){
 		var v;
@@ -40,6 +47,7 @@ function modifyDOM(linha, quantidade) {
 	return true; 
 }
 
+// Modulo para preencher a Loteca
 function modifyDOMLoteca(linha) {
 
 	var volante = linha.split(' ');
@@ -59,6 +67,16 @@ function modifyDOMLoteca(linha) {
 	return true;
 }
 
+// função para mandar executar no DOM a função marca os números.
+function marcaJogo(linha, quantidade, qtdTeimosa, marcaEspelho) {
+	chrome.tabs.executeScript({
+		code: "(" + modifyDOM + ")('"+ linha +"','" + quantidade + "','" + qtdTeimosa + "','" + marcaEspelho + "' );"
+	}, (results) => {
+		console.log('erro');
+	});
+}
+
+// funcao para clicar nas modalidades do site da caixa pela extensao
 function clickModalidade(modalidade) {
     document.querySelector("#menuPrincipal a#" + modalidade).click();
 }
@@ -71,16 +89,28 @@ document.getElementById('modalidade').onchange = function() {
 	});
 }
 
-document.getElementById('mybutton').onclick = function() {
+// coloca o botão na extensão
+document.write("<button id='mybutton'>Preencher jogos</button>");
+var button = document.getElementById('mybutton');
+
+// atribui a ação onclick do clicar no botão 
+button.onclick = function() {
 
     var modalidade = document.getElementById("modalidade").value;
     var quantidadeAMarcar = document.getElementById("quantidade").value;
     var jogos = document.getElementById("listadejogos").value;
+    var e = document.getElementById("quantidade");
+    var t = document.getElementById("qtdTeimosinha");
+    var esp = document.getElementById("espelho");
+    var qtdTeimosa = t.options[t.selectedIndex].value;
+    var quantidadeAMarcar = e.options[e.selectedIndex].value;
+    var marcaEspelho = 0;
+    if (esp.checked ) marcaEspelho = 1;
 
     if (modalidade == "") {
         alert("Por favor informe a modalidade");
     } else if (jogos == "") {
-        alert("Preencha os jogos no campo abaixo");
+        alert("Preencha os jogos");
     } else {
         var lines = jogos.split('\n');
         if (modalidade == "Loteca") {
@@ -92,13 +122,9 @@ document.getElementById('mybutton').onclick = function() {
                 });
             };
         } else {
-            for(var i = 0;i < lines.length;i++){
-                chrome.tabs.executeScript({
-                    code: "(" + modifyDOM + ")('"+ lines[i] +"','" + quantidadeAMarcar + "');"
-                }, (results) => {
-                    console.log('erro');
-                });
-            };
+		for(var i = 0;i < lines.length;i++){
+			marcaJogo( lines[i], quantidadeAMarcar, qtdTeimosa, marcaEspelho );
+		};
         }
     }
 }
