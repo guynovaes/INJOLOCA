@@ -1,33 +1,57 @@
 <!doctype html>
-
 <html>
-  <head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Inserir jogos no Loterias Online da Caixa</title>
     <style>
-      body {
+    body {
         min-width: 357px;
         overflow-x: hidden;
-      }
-      img {
-        margin: 5px;
-        border: 2px solid black;
-        vertical-align: middle;
-        width: 75px;
-        height: 75px;
-      }
+    }
+    #mybutton {
+        float:right;
+        margin-bottom: 10px;
+    }
     </style>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  </head>
-  <body>
+</head>
+<body>
     <h3>Copie seus jogos no campo abaixo e aperte o botao</h3>
 	<b>ATENCAO</b>: Extensão sem garantia, altere conforme a sua necessidade. O autor NÃO quer saber se esta extensao deixou de funcionar. É comum a Caixa modificar o site dela e com isso ela perde a funcionalidade.
 	<br>
 	Extensão não desenvolvida pela Caixa. Quer saber como usar, procure o vídeo sobre no canal do YouTube do autor clicando <a href="https://www.youtube.com/channel/UCIrI4qlfFQN6cUrTXoGAdZA" target='_novo'>aqui</a>
 	<br>
-	<textarea id="listadejogos" rows="30" cols="180"></textarea>
-  <br>
-  <br>
-  Quantidade de números além do jogo simples que devem ser marcados:<select name='quantidade' id='quantidade'><option value=0>0</option><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>4</option><option value=5>5</option><option value=6>6</option><option value=7>7</option><option value=8>8</option><option value=9>9</option></select>
-  </body>
+	<br>
+
+    Selecione a modalidade:
+    <select name='modalidade' id='modalidade'>
+        <option value=""></option>
+        <option value="Mega-Sena">Mega-Sena</option>
+        <option value="Lotofácil">Lotofácil</option>
+        <option value="Quina">Quina</option>
+        <option value="Lotomania">Lotomania</option>
+        <option value="Timemania">Timemania</option>
+        <option value="Loteca">Loteca</option>
+        <option value="Dia-de-Sorte">Dia de Sorte</option>
+        <option value="Super-Sete">Super Sete</option>
+    </select><br />
+
+    <button id='mybutton'>Preencher jogos</button>
+
+    Quantidade de números além do jogo simples que devem ser marcados:
+    <select name='quantidade' id='quantidade'>
+        <option value=0>0</option>
+        <option value=1>1</option>
+        <option value=2>2</option>
+        <option value=3>3</option>
+        <option value=4>4</option>
+        <option value=5>5</option>
+        <option value=6>6</option>
+        <option value=7>7</option>
+        <option value=8>8</option>
+        <option value=9>9</option>
+    </select><br />
+
+    <textarea id="listadejogos" rows="25" cols="180"></textarea>
+</body>
 </html>
 <script src="popup.js"></script>

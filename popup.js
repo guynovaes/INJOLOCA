@@ -40,28 +40,65 @@ function modifyDOM(linha, quantidade) {
 	return true; 
 }
 
-// função para mandar executar no DOM a função marca os números.
-function marcaJogo(linha, quantidade) {
+function modifyDOMLoteca(linha) {
+
+	var volante = linha.split(' ');
+	document.getElementById('limparvolante').click();
+
+    if (volante.length == 14) {
+        var links = document.querySelectorAll("a.loteca_palpite");
+        for(var i = 0;i < volante.length;i++){
+            for(var contador = 0; contador <= 2; contador++) {
+                if (volante[i][contador] == 'X') links[(i * 3) + contador].click();
+            }
+        }
+    
+        document.getElementById('colocarnocarrinho').click();
+    }
+
+	return true;
+}
+
+function clickModalidade(modalidade) {
+    document.querySelector("#menuPrincipal a#" + modalidade).click();
+}
+
+document.getElementById('modalidade').onchange = function() {
 	chrome.tabs.executeScript({
-		code: "(" + modifyDOM + ")('"+ linha +"','" + quantidade + "' );"
+		code: "(" + clickModalidade + ")('"+ this.value + "' );"
 	}, (results) => {
 		console.log('erro');
 	});
 }
 
-// coloca o botão na extensão
-document.write("<button id='mybutton'>Preencher jogos</button>");
-var button = document.getElementById('mybutton');
+document.getElementById('mybutton').onclick = function() {
 
-// atribui a ação onclick do clicar no botão 
-button.onclick = function() {
-	var lines = document.getElementById("listadejogos").value.split('\n');
-	var e = document.getElementById("quantidade");
-	var quantidadeAMarcar = e.options[e.selectedIndex].value;
+    var modalidade = document.getElementById("modalidade").value;
+    var quantidadeAMarcar = document.getElementById("quantidade").value;
+    var jogos = document.getElementById("listadejogos").value;
 
-	for(var i = 0;i < lines.length;i++){
-		marcaJogo( lines[i], quantidadeAMarcar  );
-	};
+    if (modalidade == "") {
+        alert("Por favor informe a modalidade");
+    } else if (jogos == "") {
+        alert("Preencha os jogos no campo abaixo");
+    } else {
+        var lines = jogos.split('\n');
+        if (modalidade == "Loteca") {
+            for(var i = 0;i < lines.length;i++){
+                chrome.tabs.executeScript({
+                    code: "(" + modifyDOMLoteca + ")('"+ lines[i] +"');"
+                }, (results) => {
+                    console.log('erro');
+                });
+            };
+        } else {
+            for(var i = 0;i < lines.length;i++){
+                chrome.tabs.executeScript({
+                    code: "(" + modifyDOM + ")('"+ lines[i] +"','" + quantidadeAMarcar + "');"
+                }, (results) => {
+                    console.log('erro');
+                });
+            };
+        }
+    }
 }
-
-
