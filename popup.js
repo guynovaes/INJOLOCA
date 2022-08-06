@@ -22,10 +22,33 @@ function modifyDOM(linha, quantidade, qtdTeimosa, marcaEspelho) {
 	// clica no botão aumentarnumero a quantidade de vezes da Teimosinha
 	for(var i = 0;i < qtdTeimosa; i++){
 		document.getElementById('aumentarteimosinha').click();
+	}
+
+	quantidade = 0;
+	for(var i = 0;i < volante.length;i++){
+		if (volante[i] == 'T1')	quantidade = quantidade + 1;
+		if (volante[i] == 'T2')	quantidade = quantidade + 1;
+		if (volante[i] == 'T3')	quantidade = quantidade + 1;
+		if (volante[i] == 'T4')	quantidade = quantidade + 1;
+		if (volante[i] == 'T5')	quantidade = quantidade + 1;
+		if (volante[i] == 'T6')	quantidade = quantidade + 1;
+	}
+
+	// clica no botão aumentarnumero a quantidade trevos que o usuário selecionou
+	for(var i = 2; i < quantidade; i++){
+		document.getElementById('step6').childNodes[1].children[1].childNodes[0].click();
 	}	
 
 	for(var i = 0;i < volante.length;i++){
 		var v;
+
+		if (volante[i] == 'T1')	v = document.getElementById('trevo1').click();
+		if (volante[i] == 'T2')	v = document.getElementById('trevo2').click();
+		if (volante[i] == 'T3')	v = document.getElementById('trevo3').click();
+		if (volante[i] == 'T4')	v = document.getElementById('trevo4').click();
+		if (volante[i] == 'T5')	v = document.getElementById('trevo5').click();
+		if (volante[i] == 'T6')	v = document.getElementById('trevo6').click();
+
 		if (volante[i] == 'JAN') v = document.querySelector("#carrossel_diadesorte").childNodes[0].childNodes[1].click()
 		if (volante[i] == 'FEV') v = document.querySelector("#carrossel_diadesorte").childNodes[0].childNodes[3].click()
 		if (volante[i] == 'MAR') v = document.querySelector("#carrossel_diadesorte").childNodes[0].childNodes[5].click()
@@ -132,6 +155,8 @@ function modifyDOM(linha, quantidade, qtdTeimosa, marcaEspelho) {
 		if (v != null) v.click();
 	}
 
+
+
 	document.getElementById('colocarnocarrinho').click();
 	return true; 
 }
@@ -178,6 +203,11 @@ document.getElementById('modalidade').onchange = function() {
 	});
 }
 
+function sleepFor( sleepDuration ){
+    var now = new Date().getTime();
+    while(new Date().getTime() < now + sleepDuration){ /* faça nada */ } 
+}
+
 // coloca o botão na extensão
 document.write("<button id='mybutton'>Preencher jogos</button>");
 var button = document.getElementById('mybutton');
@@ -213,7 +243,9 @@ button.onclick = function() {
         } else {
 		for(var i = 0;i < lines.length;i++){
 			marcaJogo( lines[i], quantidadeAMarcar, qtdTeimosa, marcaEspelho );
+			sleepFor(600); //mileseg
 		};
         }
     }
+    alert("Processamento concluído!");
 }
