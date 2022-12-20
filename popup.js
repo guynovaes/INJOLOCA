@@ -126,6 +126,8 @@ button.onclick = function() {
     var modalidade = document.getElementById("modalidade").value;
     var quantidadeAMarcar = document.getElementById("quantidade").value;
     var jogos = document.getElementById("listadejogos").value;
+	jogos = String(jogos).replace(/\b([1-9])\b/g,"0$1"); // admitindo entrada sem zero à esquerda
+
     var e = document.getElementById("quantidade");
     var t = document.getElementById("qtdTeimosinha");
     var esp = document.getElementById("espelho");
