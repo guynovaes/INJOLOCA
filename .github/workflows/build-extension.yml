@@ -36,28 +36,25 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install semver
-        run: npm install semver
+      - name: Install semver + jq
+        run: |
+          npm install semver
+          sudo apt-get install -y jq
 
-      # 3️⃣ Bump version baseado em tags do GitHub
-      - name: Bump version from Git tags
+      # 3️⃣ Bump version seguro (baseado em tags)
+      - name: Bump version
         id: bump
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
-          echo "Última tag: $LAST_TAG"
-          
-          VERSION=${LAST_TAG#v}  # remove o prefixo v
-          NEW_VERSION=$(npx semver $VERSION -i $BUMP_TYPE)
+          VERSION=${LAST_TAG#v}
+          NEW_VERSION=$(npx semver "$VERSION" -i $BUMP_TYPE)
 
           echo "Nova versão: $NEW_VERSION"
 
-          # Atualiza manifest.json
           jq ".version=\"$NEW_VERSION\"" manifest.json > tmp.json && mv tmp.json manifest.json
-
-          # Exporta para os próximos steps
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
         env:
-          BUMP_TYPE: ${{ github.event.inputs.bump_type || 'patch' }}
+          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
 
       # 4️⃣ Commit + tag
       - name: Commit new version
@@ -77,15 +74,32 @@ jobs:
             manifest.json \
             popup.html \
             popup.js \
-            LICENCE \
+            LICENSE \
             background.js \
             icon48.png \
             icon128.png
-          echo "Extension ZIP created: $ZIP_NAME"
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
 
-      # 6️⃣ Upload ZIP como artifact
-      - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v4
+      # 6️⃣ Criar Release no GitHub
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: injoloca-extension
-          path: injoloca-${{ steps.bump.outputs.new_version }}.zip
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          release_name: "INJOLOCA v${{ steps.bump.outputs.new_version }}"
+          body: "Versão automática gerada pelo workflow."
+          draft: false
+          prerelease: false
+
+      # 7️⃣ Upload ZIP como asset da Release
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./injoloca-${{ steps.bump.outputs.new_version }}.zip
+          asset_name: injoloca-${{ steps.bump.outputs.new_version }}.zip
+          asset_content_type: application/zip
