@@ -36,19 +36,7 @@ jobs:
       # 3️⃣ Bump version no manifest.json
       - name: Bump version
         id: bump
-        run: |
-          node -e "
-          const fs = require('fs');
-          const semver = require('semver');
-          const manifestPath = './manifest.json';
-          const manifest = JSON.parse(fs.readFileSync(manifestPath));
-          const type = process.env.BUMP_TYPE;
-          const oldVersion = manifest.version;
-          const newVersion = semver.inc(oldVersion, type);
-          manifest.version = newVersion;
-          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-          fs.writeFileSync(process.env.GITHUB_OUTPUT, `new_version=${newVersion}\n`);
-          "
+        run: node bump_version.js
         env:
           BUMP_TYPE: ${{ github.event.inputs.bump_type }}
 
