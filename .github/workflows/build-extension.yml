@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      
+
   workflow_dispatch:
     inputs:
       bump_type:
@@ -39,12 +39,25 @@ jobs:
       - name: Install semver
         run: npm install semver
 
-      # 3️⃣ Bump version seguro
-      - name: Bump version
+      # 3️⃣ Bump version baseado em tags do GitHub
+      - name: Bump version from Git tags
         id: bump
-        run: node bump_version.js
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
+          echo "Última tag: $LAST_TAG"
+          
+          VERSION=${LAST_TAG#v}  # remove o prefixo v
+          NEW_VERSION=$(npx semver $VERSION -i $BUMP_TYPE)
+
+          echo "Nova versão: $NEW_VERSION"
+
+          # Atualiza manifest.json
+          jq ".version=\"$NEW_VERSION\"" manifest.json > tmp.json && mv tmp.json manifest.json
+
+          # Exporta para os próximos steps
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
         env:
-          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
+          BUMP_TYPE: ${{ github.event.inputs.bump_type || 'patch' }}
 
       # 4️⃣ Commit + tag
       - name: Commit new version
