@@ -62,7 +62,7 @@ jobs:
           echo "Extension ZIP created: $ZIP_NAME"
 
       - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: injologa-extenssion
           path: injologa-${{ steps.bump.outputs.new_version }}.zip
