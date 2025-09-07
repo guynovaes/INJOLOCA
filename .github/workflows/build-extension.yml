@@ -1,4 +1,4 @@
-name: Build Extension
+name: Build INJOLOCA Extension
 
 on:
   workflow_dispatch:
@@ -16,10 +16,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Checkout completo do repositório
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # garante que a branch main exista e todo o histórico esteja
 
+      # 2️⃣ Setup Node.js para usar semver
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -28,6 +33,7 @@ jobs:
       - name: Install semver
         run: npm install semver
 
+      # 3️⃣ Bump version no manifest.json
       - name: Bump version
         id: bump
         run: |
@@ -41,11 +47,12 @@ jobs:
           const newVersion = semver.inc(oldVersion, type);
           manifest.version = newVersion;
           fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-          console.log('::set-output name=new_version::' + newVersion);
+          fs.writeFileSync(process.env.GITHUB_OUTPUT, `new_version=${newVersion}\n`);
           "
         env:
           BUMP_TYPE: ${{ github.event.inputs.bump_type }}
 
+      # 4️⃣ Commit + tag
       - name: Commit new version
         run: |
           git config user.name "github-actions"
@@ -53,16 +60,18 @@ jobs:
           git add manifest.json
           git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
           git tag v${{ steps.bump.outputs.new_version }}
-          git push origin main --tags
+          git push origin HEAD:main --tags
 
+      # 5️⃣ Criar ZIP da extensão
       - name: Create ZIP for Chrome Web Store
         run: |
-          ZIP_NAME="injologa-${{ steps.bump.outputs.new_version }}.zip"
+          ZIP_NAME="injoloca-${{ steps.bump.outputs.new_version }}.zip"
           zip -r $ZIP_NAME * -x "*.git*" "*.github*" "*.DS_Store*"
           echo "Extension ZIP created: $ZIP_NAME"
 
+      # 6️⃣ Upload ZIP como artifact
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: injologa-extenssion
-          path: injologa-${{ steps.bump.outputs.new_version }}.zip
+          name: injoloca-extension
+          path: injoloca-${{ steps.bump.outputs.new_version }}.zip
