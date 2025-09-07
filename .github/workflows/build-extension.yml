@@ -1,0 +1,68 @@
+name: Build Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Tipo de incremento de versão'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install semver
+        run: npm install semver
+
+      - name: Bump version
+        id: bump
+        run: |
+          node -e "
+          const fs = require('fs');
+          const semver = require('semver');
+          const manifestPath = './manifest.json';
+          const manifest = JSON.parse(fs.readFileSync(manifestPath));
+          const type = process.env.BUMP_TYPE;
+          const oldVersion = manifest.version;
+          const newVersion = semver.inc(oldVersion, type);
+          manifest.version = newVersion;
+          fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+          console.log('::set-output name=new_version::' + newVersion);
+          "
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump_type }}
+
+      - name: Commit new version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add manifest.json
+          git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
+          git tag v${{ steps.bump.outputs.new_version }}
+          git push origin main --tags
+
+      - name: Create ZIP for Chrome Web Store
+        run: |
+          ZIP_NAME="injologa-${{ steps.bump.outputs.new_version }}.zip"
+          zip -r $ZIP_NAME * -x "*.git*" "*.github*" "*.DS_Store*"
+          echo "Extension ZIP created: $ZIP_NAME"
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: injologa-extenssion
+          path: injologa-${{ steps.bump.outputs.new_version }}.zip
