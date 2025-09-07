@@ -16,15 +16,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: release   # apenas aprovadores do environment podem executar
+    if: github.ref == 'refs/heads/master'  # somente master
 
     steps:
-      # 1️⃣ Checkout completo do repositório
+      # 1️⃣ Checkout completo
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # garante que a branch main exista e todo o histórico esteja
+          fetch-depth: 0
 
-      # 2️⃣ Setup Node.js para usar semver
+      # 2️⃣ Setup Node.js para semver
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -33,7 +35,7 @@ jobs:
       - name: Install semver
         run: npm install semver
 
-      # 3️⃣ Bump version no manifest.json
+      # 3️⃣ Bump version seguro
       - name: Bump version
         id: bump
         run: node bump_version.js
@@ -48,13 +50,20 @@ jobs:
           git add manifest.json
           git commit -m "Bump version to ${{ steps.bump.outputs.new_version }}"
           git tag v${{ steps.bump.outputs.new_version }}
-          git push origin HEAD:main --tags
+          git push origin HEAD:master --tags
 
-      # 5️⃣ Criar ZIP da extensão
+      # 5️⃣ Criar ZIP da extensão com arquivos essenciais
       - name: Create ZIP for Chrome Web Store
         run: |
           ZIP_NAME="injoloca-${{ steps.bump.outputs.new_version }}.zip"
-          zip -r $ZIP_NAME * -x "*.git*" "*.github*" "*.DS_Store*"
+          zip -r $ZIP_NAME \
+            manifest.json \
+            popup.html \
+            popup.js \
+            LICENCE \
+            background.js \
+            icon48.png \
+            icon128.png
           echo "Extension ZIP created: $ZIP_NAME"
 
       # 6️⃣ Upload ZIP como artifact
