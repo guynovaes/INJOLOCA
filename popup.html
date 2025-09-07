@@ -3,6 +3,33 @@
   <head>
     <title>Inserir jogos no Loterias Online da Caixa</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      .progress-container {
+        width: 100%;
+        background-color: #f1f1f1;
+        margin: 10px 0;
+        display: none;
+      }
+      .progress-bar {
+        width: 0%;
+        height: 30px;
+        background-color: #4CAF50;
+        text-align: center;
+        line-height: 30px;
+        color: white;
+      }
+      #cancelButton {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        margin-left: 10px;
+        cursor: pointer;
+        display: none;
+      }
+    </style>    
+    
+    
   </head>
   <body>
     <h3>Copie no campo maior abaixo os jogos gerados pelo software COLOGA e aperte o botão <b>Preencher jogos</b> </h3>
@@ -24,6 +51,7 @@
         <option value="Mega-Sena">Mega Sena</option>
         <option value="data-jogo-mega-sena-especial">Mega da Virada</option>
         <option value="Quina">Quina</option>
+        <option value="data-jogo-quina-especial">Quina de São João</option>        
         <option value="Super-Sete">Super Sete</option>
         <option value="Timemania">Timemania</option>
 
@@ -37,6 +65,15 @@
   <input type="checkbox" id="espelho" name="espelho" value=1>
   <label for="espelho"> Sendo o jogo selecionado para a Lotomania, ative caso queira marcar o espelho nas apostas.</label><br>  
   <br>
+  
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+
+    <div>
+    <button id="mybutton">Preencher jogos</button>
+    </div>
+  
 <script src="popup.js"></script>
 	<br>
 	<br>
